@@ -8,25 +8,37 @@
    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="canvas"></div>
+    <canvas id="canvas" width="100" height="100"></canvas>  
     <script>
-               canvas.onclick = (e) => {
-            console.log(e.clientX)
-            console.log(e.clientY)
-            // console.log 调试大法
-            let div = document.createElement('div')           //让文档创建一个标签（元素）
-            div.style.position = 'absolute'                   //让div绝对定位
-            div.style.left = e.clientX + 'px'
-            div.style.top = e.clientY + 'px'
-            div.style.width = '6px'
-            div.style.height = '6px'
-            div.style.marginLeft = '-3px'
-            div.style.marginTop = '-3px'
-            div.style.borderRadius = '50%'
-            div.style.backgroundColor = 'black'
-            canvas.appendChild(div)
+        let canvas = document.getElementById("canvas");    //通过 id 找到 canvas
+        canvas.width = document.documentElement.clientWidth   // 获取文档的宽度 并把canvas的宽度变成文档的宽度
+        canvas.height = document.documentElement.clientHeight  //  宽高放在最前面 并把canvas的高度变成文档的高度
+        let ctx = canvas.getContext("2d");
+
+        let painting = false
+
+        ctx.fillStyle = "black";     //  填充样式（颜色）
+        ctx.strokeStyle = 'none'     //  去除描边
+        canvas.onmousedown = () => {
+            painting = true
         }
 
+        canvas.onmousemove =(e) => {
+            if(painting === true){
+                // ctx.fillRect (e.clientX -5, e.clientY -5, 10, 10);      //  填充一个矩形（x坐标，y坐标，宽度，高度）
+                ctx.beginPath()
+                ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI)
+                ctx.stroke()
+                ctx.fill()
+            }else{
+                console.log('什么都不做')
+            }
+        }
+
+        canvas.onmouseup = ()=>{
+            painting = false
+        }
     </script>
 </body>
 </html>
+

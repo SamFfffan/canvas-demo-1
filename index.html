@@ -10,26 +10,63 @@
 <body>
     <canvas id="canvas" width="100" height="100"></canvas>  
     <script>
-        let canvas = document.getElementById("canvas");    //通过 id 找到 canvas
-        canvas.width = document.documentElement.clientWidth   // 获取文档的宽度 并把canvas的宽度变成文档的宽度
-        canvas.height = document.documentElement.clientHeight  //  宽高放在最前面 并把canvas的高度变成文档的高度
+        let canvas = document.getElementById("canvas");                    //  通过 id 找到 canvas
+        canvas.width = document.documentElement.clientWidth                //  获取文档的宽度 并把canvas的宽度变成文档的宽度
+        canvas.height = document.documentElement.clientHeight              //  宽高放在最前面 并把canvas的高度变成文档的高度
         let ctx = canvas.getContext("2d");
+        ctx.fillStyle = "black";                                           //  填充样式（颜色）
+        ctx.strokeStyle = 'none'                                           //  去除描边
+        ctx.lineWidth = 10
+        ctx.lineCap = "round"                                              //  解决散点问题，让线永远连着 
 
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath()
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+            ctx.stroke()
+
+        }
+       
         let painting = false
+        let last 
 
-        ctx.fillStyle = "black";     //  填充样式（颜色）
-        ctx.strokeStyle = 'none'     //  去除描边
-        canvas.onmousedown = () => {
+        let isTouchDevice = 'ontouchstart' in                              //  支持手机触屏
+        document.documentElement
+        //  console.log(isTouchDevice)                                     //  测试指令 网页false 手机 true
+        if(isTouchDevice){
+            canvas.ontouchstart = (e) =>{                                  //  手机上没有down事件，所以没有第一个last，必须再加一个事件
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            last = [x, y]  
+            }
+            canvas.ontouchmove = (e) =>{
+        // console.log(e.toucher[0])                                       //  用来拿到touches 第0个手指的 clientX，clientY坐标
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+        //    console.log(x,y)
+            // ctx.beginPath()
+            //     ctx.arc(x, y, 10, 0, 2 * Math.PI)
+            //     ctx.stroke()
+            //     ctx.fill()
+                drawLine(last[0], last[1], x, y)          
+                last = [x, y]                             
+        }
+        }else{
+            canvas.onmousedown = (e) => {
             painting = true
+            last = [e.clientX, e.clientY]                                  //  当鼠标按下时候，把 e.clientX和e.clientY 作为上一次的点
         }
 
         canvas.onmousemove =(e) => {
+
             if(painting === true){
                 // ctx.fillRect (e.clientX -5, e.clientY -5, 10, 10);      //  填充一个矩形（x坐标，y坐标，宽度，高度）
-                ctx.beginPath()
-                ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI)
-                ctx.stroke()
-                ctx.fill()
+                // ctx.beginPath()
+                // ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI)
+                // ctx.stroke()
+                // ctx.fill()
+                drawLine(last[0], last[1], e.clientX, e.clientY)           //  在移动的时候，每次连接上一次和这一次
+                last = [e.clientX, e.clientY]                              //  实时更新
             }else{
                 console.log('什么都不做')
             }
@@ -38,6 +75,13 @@
         canvas.onmouseup = ()=>{
             painting = false
         }
+        }
+
+
+ 
+
+
+        
     </script>
 </body>
 </html>
